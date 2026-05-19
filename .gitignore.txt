@@ -1,0 +1,7 @@
+# Archivos compilados de Java
+*.class
+
+# Configuraciones de editores
+.vscode/
+.idea/
+*.iml
