@@ -1,6 +1,5 @@
 package contenedores;
-import recursos.Nodo;
-import recursos.OperacionesCL1;
+
 public abstract class ColaLinkedList <T> implements OperacionesCL1<T>{
 	protected Nodo<T> frenteC, finalC;
 	

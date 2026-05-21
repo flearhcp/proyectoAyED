@@ -1,4 +1,4 @@
-package recursos;
+package contenedores;
 
 public class Nodo<T> {
 	private T nodoInfo;

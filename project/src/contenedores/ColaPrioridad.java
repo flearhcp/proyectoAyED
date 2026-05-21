@@ -1,7 +1,6 @@
 package contenedores;
-import recursos.Nodo;
 
-public  class ColaPrioridad<T extends Comparable<T>> extends ColaLinkedList<T>{
+public class ColaPrioridad<T extends Comparable<T>> extends ColaLinkedList<T>{
 	public boolean esMenor(T objA, T objB){
 		return (objA.compareTo(objB) < 0);
 	}
