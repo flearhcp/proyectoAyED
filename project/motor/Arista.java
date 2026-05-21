@@ -4,6 +4,7 @@ public class Arista {
     private Vertice origen;
     private Vertice destino;
     private Calle calle;
+    private long peso;
   /*   private double distancia;
     private double tiempo; */
 
@@ -11,8 +12,13 @@ public class Arista {
         this.origen = origen;
         this.destino = destino;
         this.calle = calle;
+        this.peso = 1;
      /*    this.distancia = distancia;
         this.tiempo = tiempo; */
+    }
+
+    public long getPeso(){
+        return this.peso;
     }
 
     public Calle getCalle() {
