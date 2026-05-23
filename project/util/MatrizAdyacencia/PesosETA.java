@@ -1,5 +1,5 @@
 // 1. Definir un método para obtener velocidad según el tipo de calle
-public static double obtenerVelocidadMS(String tipoCalle) {
+/*public static double obtenerVelocidadMS(String tipoCalle) {
     switch (tipoCalle) {
         case "primary": return 45.0 / 3.6;   // 12.5 m/s
         case "secondary": return 35.0 / 3.6; // 9.7 m/s
@@ -13,7 +13,7 @@ public static double obtenerVelocidadMS(String tipoCalle) {
 String tipoCalle = props.optString("highway", "residential");
 double velocidad = obtenerVelocidadMS(tipoCalle);
 
-for (int j = 0; j < coords.length() - 1; j++) {
+for(int j = 0; j < coords.length() - 1; j++){
     Node u = puntos.get(coords.get(j));
     Node v = puntos.get(coords.get(j+1));
     
@@ -24,4 +24,4 @@ for (int j = 0; j < coords.length() - 1; j++) {
     if (!esManoUnica) {
         matrizTiempo[idV][idU] = tiempoSegundos;
     }
-}
+}*/

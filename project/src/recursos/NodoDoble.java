@@ -1,40 +1,40 @@
 package recursos;
 
-public class NodoDoble {
+public class NodoDoble<T> {
 
-	private Object nodoInfo;
-	private NodoDoble prevNodo, nextNodo;
+	private T nodoInfo;
+	private NodoDoble<T> prevNodo, nextNodo;
 	
-	public NodoDoble(Object nodoInfo){
+	public NodoDoble(T nodoInfo){
 		this(nodoInfo,null,null);} 
 	
-	public NodoDoble(Object nodoInfo, NodoDoble nextNodo){
+	public NodoDoble(T nodoInfo, NodoDoble<T> nextNodo){
 		this(nodoInfo,null,nextNodo);} 
 	
-	public NodoDoble(Object nodoInfo, NodoDoble prevNodo, NodoDoble nextNodo){
+	public NodoDoble(T nodoInfo, NodoDoble<T> prevNodo, NodoDoble<T> nextNodo){
 		this.nodoInfo=nodoInfo;
 		this.prevNodo=prevNodo; this.nextNodo=nextNodo; 
 	}
 	
-	public void setPrevNodo(NodoDoble prevNodo){
+	public void setPrevNodo(NodoDoble<T> prevNodo){
 		this.prevNodo=prevNodo;
 	}
 	
-	public NodoDoble getPrevNodo(){
+	public NodoDoble<T> getPrevNodo(){
 		return this.prevNodo; 
 	}
 	
-	public void setNextNodo(NodoDoble nextNodo){
+	public void setNextNodo(NodoDoble<T> nextNodo){
 		this.nextNodo=nextNodo;
 	}
 	
-	public NodoDoble getNextNodo(){
+	public NodoDoble<T> getNextNodo(){
 		return this.nextNodo; 
 	}
-	public void setNodoInfo(Object nodoInfo){
+	public void setNodoInfo(T nodoInfo){
 		this.nodoInfo=nodoInfo; 
 	}
-	public Object getNodoInfo(){
+	public T getNodoInfo(){
 		return this.nodoInfo;
 	}
 

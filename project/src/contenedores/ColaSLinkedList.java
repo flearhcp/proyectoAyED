@@ -1,5 +1,7 @@
 package contenedores;
 
+import recursos.Nodo;
+
 public class ColaSLinkedList<T> extends ColaLinkedList<T>{
 
 	public void meter(T elemento){

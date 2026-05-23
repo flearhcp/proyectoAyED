@@ -1,4 +1,4 @@
-import org.json.JSONArray;
+/*import org.json.JSONArray;
 import org.json.JSONObject;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -88,4 +88,4 @@ public class MatrizAdyacenciaSalta {
         }
         System.out.println("\nNota: El valor '1' indica conexión permitida.");
     }
-}
+}*/
