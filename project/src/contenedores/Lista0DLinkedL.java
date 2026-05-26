@@ -1,8 +1,8 @@
 package contenedores;
 import recursos.*;
 
-public abstract class Lista0DLinkedL<T> implements OperacionesCL2<T>{
-	protected NodoDoble<T> frenteL, finalL;
+public abstract class Lista0DLinkedL implements OperacionesCL2{
+	protected NodoDoble frenteL, finalL;
 	protected int ultimo;
 	
 	public Lista0DLinkedL(){
@@ -48,7 +48,7 @@ public abstract class Lista0DLinkedL<T> implements OperacionesCL2<T>{
 						this.finalL= this.finalL.getPrevNodo();
 						this.finalL.setNextNodo(null);						
 					}else{						
-						NodoDoble<T> prev, next;
+						NodoDoble prev, next;
 						prev=this.frenteL;
 						next=this.frenteL.getNextNodo();
 						for (int counter=1; counter<posicion;counter++){
@@ -67,15 +67,15 @@ public abstract class Lista0DLinkedL<T> implements OperacionesCL2<T>{
 	}
 		
 	
-	public T devolver(int posicion){
-		T elemento=null;
+	public Object devolver(int posicion){
+		Object elemento=null;
 		if (estaVacia()){
 			System.out.println("Error devolver. Lista vacia...");
 		} else {
 			if (posicion>=tamanio() || posicion<0){
 				System.out.println("Error devolver. La posicion no existe..");
 			}else{
-				NodoDoble<T> temp;
+				NodoDoble temp;
 				temp=this.frenteL;
 				
 				for (int counter=0; counter<posicion;counter++){						
@@ -88,6 +88,6 @@ public abstract class Lista0DLinkedL<T> implements OperacionesCL2<T>{
 
 	}	
 	
-	public abstract int buscar(T elemento);
+	public abstract int buscar(Object elemento);
 
 }

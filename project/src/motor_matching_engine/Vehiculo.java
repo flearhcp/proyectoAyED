@@ -2,10 +2,10 @@ package motor_matching_engine;
 
 public class Vehiculo implements Comparable<Vehiculo> {
     private int ID; //Puede ser patente
-    private long verticeIDOrigen;
+    private int verticeIDOrigen;
     private double ETA;
 
-    public Vehiculo(int ID, long verticeOrigen){
+    public Vehiculo(int ID, int verticeOrigen){
         this.ID = ID;
         this.verticeIDOrigen = verticeOrigen;
         this.ETA = 0.0;
@@ -20,7 +20,7 @@ public class Vehiculo implements Comparable<Vehiculo> {
     public int getID() {
         return ID;
     }
-    public long getVerticeIDOrigen() {
+    public int getVerticeIDOrigen() {
         return verticeIDOrigen;
     }
     public double getETA() {

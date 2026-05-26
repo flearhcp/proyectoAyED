@@ -2,33 +2,33 @@ package contenedores;
 import recursos.*;
 
 // implementando una lista simple
-public abstract class Lista1DLinkedL<T> extends Lista0DLinkedL<T> implements OperacionesCL3<T>{
-	public void insertar(T elemento, int posicion){
-		NodoDoble<T> node;
+public abstract class Lista1DLinkedL extends Lista0DLinkedL implements OperacionesCL3{
+	public void insertar(Object elemento, int posicion){
+		NodoDoble node;
 		if (posicion>tamanio() || posicion<0){
 			System.out.println("Error insertar. Posicion inexistente ");
 		}else{
 			if (posicion==0){ // insercion al comienzo
 				if (!estaVacia()){
-					this.frenteL=new NodoDoble<T>(elemento, null, this.frenteL);
+					this.frenteL=new NodoDoble(elemento, null, this.frenteL);
 					this.frenteL.getNextNodo().setPrevNodo(this.frenteL);
 				}else{
-					this.frenteL=this.finalL=new NodoDoble<T>(elemento);					
+					this.frenteL=this.finalL=new NodoDoble(elemento);					
 				}
 			}else{
 				if (posicion==tamanio()){ // insercion al fin
-					this.finalL = new NodoDoble<T>(elemento, this.finalL, null); // nuevo nodo fin
+					this.finalL = new NodoDoble(elemento, this.finalL, null); // nuevo nodo fin
 					this.finalL.getPrevNodo().setNextNodo(this.finalL); // reconexion penultimo nodo al nuevo fin
 				}else{
 					// insercion al medio					
-					NodoDoble<T> prev, next;
+					NodoDoble prev, next;
 					prev=this.frenteL;
 					next=this.frenteL.getNextNodo();
 					for (int counter=1; counter<posicion;counter++){
 						prev=prev.getNextNodo(); next=next.getNextNodo();						
 					}
 					
-					node = new NodoDoble<T>(elemento,prev,next);
+					node = new NodoDoble(elemento,prev,next);
 					prev.setNextNodo(node); // actualizo referencias
 					next.setPrevNodo(node);					
 				}
@@ -37,7 +37,7 @@ public abstract class Lista1DLinkedL<T> extends Lista0DLinkedL<T> implements Ope
 		}		
 	}
 	
-	public void reemplazar(T elemento, int posicion){		
+	public void reemplazar(Object elemento, int posicion){		
 		if (estaVacia()){
 			System.out.println("Error reemplazar. Lista vacia...");
 		} else {
@@ -50,7 +50,7 @@ public abstract class Lista1DLinkedL<T> extends Lista0DLinkedL<T> implements Ope
 					if (posicion==tamanio()-1){
 						this.finalL.setNodoInfo(elemento);
 					}else {
-						NodoDoble<T> temp;
+						NodoDoble temp;
 						temp=this.frenteL;
 						
 						for (int counter=0; counter<posicion;counter++){						
@@ -64,12 +64,12 @@ public abstract class Lista1DLinkedL<T> extends Lista0DLinkedL<T> implements Ope
 		}		
 	}
 	
-	public abstract boolean iguales(T elementoL, T elemento);
+	public abstract boolean iguales(Object elementoL, Object elemento);
 	
-	public int buscar(T elemento){		
+	public int buscar(Object elemento){		
 		int posicion=-1; int contador=0;
-		T unElemento;
-		NodoDoble<T> temp;
+		Object unElemento;
+		NodoDoble temp;
 		
 		temp=this.frenteL;
 		while (temp!=null && posicion==-1){
