@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 public class TestGUI extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("GUI/ventana.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/GUI/ventana.fxml"));
         primaryStage.setTitle("Sistema de despacho ETA - Salta MacroCentro");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
