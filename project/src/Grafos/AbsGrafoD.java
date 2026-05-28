@@ -74,7 +74,6 @@ public abstract class AbsGrafoD extends AbsGrafo implements OperacionesGD{
 			}
 			
 			if(minVertex!=-1){
-				System.out.println("it " + i + " minVertex " + minVertex + " minCost " + minCost);
 				this.listaSolucion.reemplazar(minVertex, minVertex);
 				this.listaDistancia.reemplazar(minCost, minVertex);
 					

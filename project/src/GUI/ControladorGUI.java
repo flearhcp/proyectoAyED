@@ -6,17 +6,20 @@ import javafx.scene.control.ListView;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import motor_matching_engine.Vehiculo;
+import motor_matching_engine.*;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import contenedores.ColaPrioridad;
+import Grafos.GrafoMapa;
+import contenedores.ListaDoubleLinkedL;
 
 public class ControladorGUI implements Initializable{
     @FXML private Canvas canvasMapa;
     @FXML private ListView<String> listaVehiculos;
     @FXML private ListView<String> listaDespacho;
+    private GrafoMapa grafo;
+    private MotorDespacho motor;
 
     @Override
     public void initialize(URL location, ResourceBundle resource){
@@ -41,25 +44,26 @@ public class ControladorGUI implements Initializable{
     }
     @FXML
     private void handleNuevaSolicitud(){
-        ColaPrioridad<Vehiculo> colaDespacho = new ColaPrioridad<>();
-
-        Vehiculo t1 = new Vehiculo(1, 100); t1.setActualEta(8.5);
-        Vehiculo t2 = new Vehiculo(2, 200); t2.setActualEta(3.2);
-        Vehiculo t3 = new Vehiculo(3, 300); t3.setActualEta(5.4);
-
-        colaDespacho.meter(t1);
-        colaDespacho.meter(t2);
-        colaDespacho.meter(t3);
-
-        listaDespacho.getItems().clear();
-        while(!colaDespacho.estaVacia()){
-            Vehiculo prox = colaDespacho.sacar();
-            listaDespacho.getItems().add("Vehiculo "+ prox.getID() + " | ETA: "+ prox.getETA() +" min");
-
+        Usuario pasajero;
+        ListaDoubleLinkedL flota = new ListaDoubleLinkedL();
+        Vehiculo asignado;
+        this.motor = new MotorDespacho(grafo);
+        pasajero = motor.usuarioRandom(grafo);
+        flota = motor.generaFlota(grafo);
+        asignado = motor.despacharViaje(pasajero, flota);
+        
+        if(asignado != null){
+            listaDespacho.getItems().add("Viaje asignado auto: "+ asignado.getID());
         }
+        
+        listaDespacho.getItems().clear();
+        
     }
     @FXML
     private void handleLimpiarSeleccion(){
         listaDespacho.getItems().clear();
+    }
+    public void setGrafo(GrafoMapa grafo){
+        this.grafo = grafo;
     }
 }

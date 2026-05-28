@@ -8,13 +8,17 @@ import Grafos.*;
 //import Grafo.*;
 
 public class MotorDespacho {
+    private GrafoMapa miGrafo;
+    public MotorDespacho(GrafoMapa grafo){
+        this.miGrafo = grafo;
+    }
 
-    public Vehiculo despacharViaje(Usuario pasajero,Lista1DLinkedL flota,GrafoMapa miGrafo){
+    public Vehiculo despacharViaje(Usuario pasajero,ListaDoubleLinkedL flota){
         ColaPrioridad<Vehiculo> cola = new ColaPrioridad<>();
         Vehiculo elegido,aux;
         for (int i = 0; i < flota.tamanio(); i++) {
             aux = (Vehiculo)flota.devolver(i);
-            double eta = miGrafo.Dijkstra(pasajero.getVerticeIDOrigen(),aux.getVerticeIDOrigen());
+            double eta = miGrafo.calcularCostoDijkstra(aux.getVerticeIndiceOrigen(),pasajero.getVerticeIDOrigen());
             aux.setActualEta(eta);
             cola.meter(aux);
         }
@@ -40,5 +44,13 @@ public class MotorDespacho {
         generado = new Vehiculo(posRandom.nextInt(), posO);
         return generado;
     }
-
+    public ListaDoubleLinkedL generaFlota(GrafoMapa grafo){
+        ListaDoubleLinkedL lista = new ListaDoubleLinkedL();
+        Vehiculo generado;
+        for (int i = 0; i < 5; i++) {
+            generado = this.vehiculoRandom(grafo);
+            lista.insertar(generado, i);
+        }
+        return lista;
+    }
 }

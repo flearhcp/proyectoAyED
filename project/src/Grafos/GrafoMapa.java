@@ -2,9 +2,11 @@ package Grafos;
 
 import LectorJSON.Arista;
 import LectorJSON.DatosMapa;
+import contenedores.ListaDoubleLinkedL;
 
-public class GrafoMapa extends GrafoDirigido{
+public class GrafoMapa extends AbsGrafoD{
 	protected DatosMapa datos;
+
 	public GrafoMapa(int orden, DatosMapa datos) {
 		super(orden);
 		this.datos = datos;
@@ -28,11 +30,37 @@ public class GrafoMapa extends GrafoDirigido{
 			}
 		}
 	}
-	public double Dijkstra(int vertexOr,int vertexDes){
-		double eta;
+	/**
+	 * Calcula el costo (ETA) desde un vértice de origen a uno de destino utilizando el algoritmo de Dijkstra.
+	 * Este método primero ejecuta el algoritmo completo desde el origen y luego devuelve el costo específico
+	 * hacia el destino.
+	 * @param vertexOr Vértice de origen.
+	 * @param vertexDes Vértice de destino.
+	 * @return El costo del camino más corto.
+	 */
+	public double calcularCostoDijkstra(int vertexOr, int vertexDes){
 		this.Dijkstra(vertexOr);
-		eta = (double)this.listaDistancia.devolver(vertexDes);
-		return eta;
+		return (double)this.listaDistancia.devolver(vertexDes);
 	}
-	
+	/**
+	 * Calcula el camino de Dijkstra desde la posición del Vehiculo hasta la posición del Pasajero.
+	 * El metodo devuelve una Lista enlazada Doble donde se encuentra el camino a recorrer en el grafo.
+	 * @param posVehiculo Vértice de origen.
+	 * @param posPasajero Vértice de destino.
+	 * @return El camino del costo más corto.
+	 */
+	public ListaDoubleLinkedL caminoDijkstra(int posVehiculo, int posPasajero){
+		ListaDoubleLinkedL camino = new ListaDoubleLinkedL();
+		int actual,predecesor;
+		this.Dijkstra(posVehiculo);
+		actual = posPasajero;
+		camino.insertar(actual, 0);
+		predecesor = (int)this.listaCamino.devolver(actual);
+		while (predecesor != -1) {
+			camino.insertar(predecesor, 0);
+			actual = predecesor;
+			predecesor = (int)this.listaCamino.devolver(actual);
+		}
+		return camino;		
+	}	
 }
