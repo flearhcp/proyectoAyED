@@ -23,6 +23,23 @@ public class DatosMapa {
     public List<Arista> getAristas () {
         return this.aristas;
     }
+
+    public double getMaxLat() {
+        return vertices.get(getCantidadVertices() - 1).getLatitud();
     }
+
+    public double getMinLat() {
+        return vertices.get(0).getLatitud();
+    }
+
+    public double getMinLon() {
+        return vertices.get(0).getLongitud();
+    }
+
+    public double getMaxLon() {
+        return vertices.get(getCantidadVertices() - 1).getLongitud();
+    }
+
+}
     
 

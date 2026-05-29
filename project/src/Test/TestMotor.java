@@ -19,13 +19,13 @@ public class TestMotor {
             grafo.cargarGrafo();
             MotorDespacho motor = new MotorDespacho(grafo);
             // Generar un usuario aleatorio en el mapa
-            Usuario pasajero = motor.usuarioRandom(grafo);
+            Usuario pasajero = motor.usuarioRandom();
             System.out.println("Pasajero generado en vértice: " + pasajero.getVerticeIDOrigen());
 
             // Generar una flota de vehículos aleatorios
             ListaDoubleLinkedL flota = new ListaDoubleLinkedL();
             for (int i = 0; i < 5; i++) {
-                flota.insertar(motor.vehiculoRandom(grafo), i);
+                flota.insertar(motor.vehiculoRandom(), i);
             }
 
             // Despachar el viaje al vehículo más cercano (menor ETA)

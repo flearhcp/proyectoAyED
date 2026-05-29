@@ -62,5 +62,6 @@ public class GrafoMapa extends AbsGrafoD{
 			predecesor = (int)this.listaCamino.devolver(actual);
 		}
 		return camino;		
-	}	
+	}
+	public DatosMapa getDatosMapa(){ return this.datos;}
 }
