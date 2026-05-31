@@ -6,11 +6,13 @@ import contenedores.ListaDoubleLinkedL;
 
 public class GrafoMapa extends AbsGrafoD{
 	protected DatosMapa datos;
+	private ListaDoubleLinkedL[] listaDeAdyacencia;
 
 	public GrafoMapa(int orden, DatosMapa datos) {
 		super(orden);
 		this.datos = datos;
 		this.inicializarMapa();
+		this.construirListaDeAdyacencia();
 	}
 	@Override
 	public void cargarGrafo(){
@@ -30,6 +32,21 @@ public class GrafoMapa extends AbsGrafoD{
 			}
 		}
 	}
+	/*Ayuda a dibujar las aristas en ControladorGUI. */
+	private void construirListaDeAdyacencia() {
+		this.listaDeAdyacencia = new ListaDoubleLinkedL[this.getOrden()];
+		for (int i = 0; i < this.getOrden(); i++) {
+			this.listaDeAdyacencia[i] = new ListaDoubleLinkedL();
+		}
+
+		int[] tamanos = new int[this.getOrden()];
+
+		for (Arista arista : this.datos.getAristas()) {
+			int indiceOrigen = arista.getOrigen().getIndice();
+			this.listaDeAdyacencia[indiceOrigen].insertar(arista, tamanos[indiceOrigen]);
+			tamanos[indiceOrigen]++;
+		}
+	}
 	/**
 	 * Calcula el costo (ETA) desde un vértice de origen a uno de destino utilizando el algoritmo de Dijkstra.
 	 * Este método primero ejecuta el algoritmo completo desde el origen y luego devuelve el costo específico
@@ -39,8 +56,8 @@ public class GrafoMapa extends AbsGrafoD{
 	 * @return El costo del camino más corto.
 	 */
 	public double calcularCostoDijkstra(int vertexOr, int vertexDes){
-		this.Dijkstra(vertexOr);
-		return (double)this.listaDistancia.devolver(vertexDes);
+		ResultadoDijkstra resultado = this.Dijkstra(vertexOr);
+		return (double)resultado.getDistancias().devolver(vertexDes);
 	}
 	/**
 	 * Calcula el camino de Dijkstra desde la posición del Vehiculo hasta la posición del Pasajero.
@@ -52,16 +69,18 @@ public class GrafoMapa extends AbsGrafoD{
 	public ListaDoubleLinkedL caminoDijkstra(int posVehiculo, int posPasajero){
 		ListaDoubleLinkedL camino = new ListaDoubleLinkedL();
 		int actual,predecesor;
-		this.Dijkstra(posVehiculo);
+		ResultadoDijkstra resultado = this.Dijkstra(posVehiculo);
 		actual = posPasajero;
 		camino.insertar(actual, 0);
-		predecesor = (int)this.listaCamino.devolver(actual);
+		predecesor = (int)resultado.getCaminos().devolver(actual);
 		while (predecesor != -1) {
 			camino.insertar(predecesor, 0);
 			actual = predecesor;
-			predecesor = (int)this.listaCamino.devolver(actual);
+			predecesor = (int)resultado.getCaminos().devolver(actual);
 		}
 		return camino;		
 	}
-	public DatosMapa getDatosMapa(){ return this.datos;}
+	public DatosMapa getDatosMapa(){return this.datos;}
+	
+	public ListaDoubleLinkedL getAdyacentes(int i){return this.listaDeAdyacencia[i];}
 }

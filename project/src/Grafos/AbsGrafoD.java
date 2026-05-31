@@ -5,7 +5,21 @@ import recursos.*;
 public abstract class AbsGrafoD extends AbsGrafo implements OperacionesGD{
 	
 	protected MatrizGrafo matrizCostoF,matrizCaminoF;
-	protected ListaDoubleLinkedL listaDistancia, listaCamino, listaSolucion;
+
+	// Clase interna de apoyo para ordenar las evaluaciones en Dijkstra
+	protected static class NodoDistancia implements Comparable<NodoDistancia> {
+		public int vertice;
+		public double distancia;
+		
+		public NodoDistancia(int vertice, double distancia) {
+			this.vertice = vertice;
+			this.distancia = distancia;
+		}
+		@Override
+		public int compareTo(NodoDistancia otro) {
+			return Double.compare(this.distancia, otro.distancia);
+		}
+	}
 
 	public AbsGrafoD(int ordenGrafo){
 		super(ordenGrafo);
@@ -16,82 +30,74 @@ public abstract class AbsGrafoD extends AbsGrafo implements OperacionesGD{
 	public void muestraDijkstra(int startVertex){
 		double currCost; int w;
 		
-		Dijkstra(startVertex);
+		ResultadoDijkstra resultado = Dijkstra(startVertex);
 		
 		for (int v=0; v<getOrden();v++){
 			System.out.println("vertice " + v);
 			if (v!=startVertex){
-				currCost=(double)this.listaDistancia.devolver(v);
+				currCost=(double)resultado.getDistancias().devolver(v);
 				System.out.println("costo desde " + startVertex + " a " + v + "->" + currCost);
 			
 				System.out.println("mostrando un camino desde "+ v + " a " + startVertex);
 				
-				w=(int)this.listaCamino.devolver(v);
+				w=(int)resultado.getCaminos().devolver(v);
 				
 				do{
 					System.out.println("camino " + w);
-					w=(int)this.listaCamino.devolver(w);
+					w=(int)resultado.getCaminos().devolver(w);
 				}while(w!=-1);//recordemos que al inicializar cambiamos todos los -1 salvo el startVertex
 			}			
 		}
 		
 	}
 	
-	public void Dijkstra(int startVertex){
-		double minCost, currCost, arcCost; int minVertex, vertex;
 		
-		this.listaDistancia = new ListaDoubleLinkedL();
-		this.listaCamino = new ListaDoubleLinkedL();
-		this.listaSolucion = new ListaDoubleLinkedL();
+	public ResultadoDijkstra Dijkstra(int startVertex){
+		ListaDoubleLinkedL listaDistancia = new ListaDoubleLinkedL();
+		ListaDoubleLinkedL listaCamino = new ListaDoubleLinkedL();
+		ListaDoubleLinkedL listaSolucion = new ListaDoubleLinkedL();
+		ColaPrioridad<NodoDistancia> pq = new ColaPrioridad<>();
 		
 		for (int i=0; i<getOrden();i++){			
-			this.listaSolucion.insertar(-1, i);
-			this.listaCamino.insertar(-1, i);
-			this.listaDistancia.insertar(infinito, i);
+			listaSolucion.insertar(-1, i);
+			listaCamino.insertar(-1, i);
+			listaDistancia.insertar(infinito, i);
 		}
-		this.listaSolucion.reemplazar(startVertex,startVertex); // el primer vertice del camino
+		// El costo de llegar al punto de inicio es 0
+		listaDistancia.reemplazar(0.0, startVertex);
 		
-		for (int i=0; i<getOrden();i++){
-			if (i!=startVertex){
-				this.listaDistancia.reemplazar(this.matrizCosto.devolver(startVertex, i), i);
-				this.listaCamino.reemplazar(startVertex, i);					
-			}
-		}
-				
+		pq.meter(new NodoDistancia(startVertex, 0.0));
 		
-		for (int i=1; i<getOrden();i++){
-			minCost=infinito;
-			minVertex=-1;
+		while (!pq.estaVacia()) {
+			NodoDistancia actual = pq.sacar();
+			int minVertex = actual.vertice;
+			double minCost = actual.distancia;
 			
-			for (int w=0; w<getOrden();w++){
-				if (w!=startVertex){
-					currCost=(double) this.listaDistancia.devolver(w);// 
-					vertex=(int) this.listaSolucion.devolver(w);
-					if (currCost<minCost && vertex==-1){
-						minCost=currCost; minVertex=w;
+			// Si el vértice ya fue procesado, lo descartamos
+			if ((int) listaSolucion.devolver(minVertex) != -1) {
+				continue;
+			}
+			
+			// Marcamos el vértice como procesado (agregado al conjunto solución)
+			listaSolucion.reemplazar(minVertex, minVertex);
+			
+			// Evaluamos todos sus adyacentes a través de la matriz de costo
+			for (int v = 0; v < getOrden(); v++) {
+				if ((int) listaSolucion.devolver(v) == -1) { // Si el vecino no ha sido visitado
+					double arcCost = (double) this.matrizCosto.devolver(minVertex, v);
+					if (arcCost != infinito) { // Si existe una conexión entre ellos
+						double currCost = (double) listaDistancia.devolver(v);
+						// Relajación de Dijkstra
+						if (minCost + arcCost < currCost) {
+							listaDistancia.reemplazar(minCost + arcCost, v);
+							listaCamino.reemplazar(minVertex, v);
+							pq.meter(new NodoDistancia(v, minCost + arcCost));
+						}
 					}
 				}
 			}
-			
-			if(minVertex!=-1){
-				this.listaSolucion.reemplazar(minVertex, minVertex);
-				this.listaDistancia.reemplazar(minCost, minVertex);
-					
-				
-				for (int v=0;v<getOrden();v++){
-					vertex=(int)this.listaSolucion.devolver(v);
-					if (vertex==-1){
-						arcCost=(double)this.matrizCosto.devolver(minVertex, v);
-						currCost=(double)this.listaDistancia.devolver(v);
-						if (minCost+arcCost<currCost){
-							this.listaDistancia.reemplazar(minCost+arcCost, v);
-							this.listaCamino.reemplazar(minVertex, v);
-												
-						}					
-					}
-				}
-			}
-		}		
+		}
+		return new ResultadoDijkstra(listaDistancia, listaCamino, listaSolucion);
 	}
 
 	
@@ -110,75 +116,6 @@ public abstract class AbsGrafoD extends AbsGrafo implements OperacionesGD{
 	}
 	
 	
-	public void muestraFloyd(){
-		this.matrizCaminoF=new MatrizGrafo(this.ordenGrafo);
-		this.matrizCostoF=new MatrizGrafo(this.ordenGrafo);
-		double costoF;
-		for(int i=0;i<ordenGrafo;i++){
-			matrizCostoF.actualizar((double)0, i, i);}
-		
-		for(int i=0;i<ordenGrafo;i++){
-			for(int j=0;j<ordenGrafo;j++){
-				if(i!=j){
-					costoF=(double)matrizCosto.devolver(i, j);
-					matrizCostoF.actualizar(costoF, i, j);
-				}
-			}
-		}
-		
-		
-		
-		Object costo;
-		for(int k=0;k<ordenGrafo;k++){
-			for(int i=0;i<ordenGrafo;i++){
-				for(int j=0;j<ordenGrafo;j++){
-					if(((Double)matrizCostoF.devolver(i, k)).doubleValue()+((Double)matrizCostoF.devolver(k, j)).doubleValue()<((Double)matrizCostoF.devolver(i, j)).doubleValue()){
-						costo=((Double)matrizCostoF.devolver(i, k)).doubleValue()+((Double)matrizCostoF.devolver(k, j)).doubleValue();
-						matrizCostoF.actualizar(costo, i, j);
-						matrizCaminoF.actualizar(k, i, j);//para obtener el camino de Floyd.
-					}
-				}
-			}
-		}
-		System.out.println("Floyd: ");
-		for(int i=0;i<ordenGrafo;i++){
-			for(int j=0;j<ordenGrafo;j++){
-				if(i!=j){
-					costoF=(double)matrizCostoF.devolver(i, j);
-					if(costoF!=infinito){System.out.println("Costo m�nimo de "+i+" hasta "+j+": "+costoF);}
-				}
-				
-				
-			}
-		}
-		
-	}
 	
-
-	
-	public void muestraCaminoFloyd(int origen, int destino){
-		double hayCamino = ((Double)this.matrizCostoF.devolver(origen, destino)).doubleValue();
-		if(hayCamino!=infinito) {
-			System.out.print("Camino entre "+origen+" y "+destino+": ");
-			System.out.print(origen);
-			buscarCaminoFloyd(origen,destino);
-			System.out.print(" "+destino);
-			System.out.println();
-		}else {
-			System.out.println("NO hay Camino entre " + origen + " y " + destino);
-		}	
-	}
-	
-	private void buscarCaminoFloyd(int i, int j){
-		Object valor=matrizCaminoF.devolver(i, j);
-		if(valor!=null){
-			int k=((Integer)valor).intValue();
-			buscarCaminoFloyd(i,k);
-			System.out.print(" "+k);
-			buscarCaminoFloyd(k,j);
-		}else{
-			System.out.print(" |");
-		}
-	}
 	
 }

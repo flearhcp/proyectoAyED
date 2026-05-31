@@ -19,9 +19,11 @@ public class LectorJson {
 
     public DatosMapa generarDatosMapa() throws Exception {
         //Actualizaciones: Con esta actualizacion los nodos se cargan sin que se repita las calles.
+
         JSONArray elementsOriginales = json.getJSONArray("elements");
         Map<Long, JSONObject> coordenadasNodos = new HashMap<>();
         List<JSONObject> listaWays = new ArrayList<>();
+        Map<Long,Coordenada> coordenadasNodos1 = new HashMap<>();
 
         for (int i = 0; i < elementsOriginales.length(); i++) {
             JSONObject obj = elementsOriginales.getJSONObject(i);
@@ -29,8 +31,9 @@ public class LectorJson {
             
             if (type.equals("node")) {
                 long nodeId = obj.getLong("id");
-                /*double latitud = obj.getDouble("lat");
-                double longitud = obj.getDouble("lon");*/
+                double latitud = obj.getDouble("lat");
+                double longitud = obj.getDouble("lon");
+                coordenadasNodos1.put(nodeId, new Coordenada(latitud, longitud));
                 coordenadasNodos.put(nodeId, obj); // Guardamos el nodo completo
             } else if (type.equals("way") && obj.has("tags")) {
                 JSONObject tags = obj.getJSONObject("tags");
@@ -93,7 +96,6 @@ public class LectorJson {
 
         // CONTAR APARICIONES DE NODOS
         Map<Long, Integer> apariciones = new HashMap<>();
-        Map<Long,Coordenada> coordenadasNodos1 = new HashMap<>();
 
         for (int i = 0; i < elements.length(); i++) {
             JSONObject obj = elements.getJSONObject(i);
@@ -105,12 +107,6 @@ public class LectorJson {
                     long nodeId = nodes.getLong(j);
                     apariciones.put(nodeId, apariciones.getOrDefault(nodeId, 0) + 1);
                 }
-            }
-            else if (obj.getString("type").equals("node")){
-                long nodeId = obj.getLong("id");
-                double latitud = obj.getDouble("lat");
-                double longitud = obj.getDouble("lon");
-                coordenadasNodos1.put(nodeId, new Coordenada(latitud,longitud));
             }
         }
 
@@ -154,7 +150,7 @@ public class LectorJson {
                 boolean oneway = tags.optString("oneway", "no").equals("yes");
                 String nombre = tags.optString("name", "S/N");
                 String tipo = tags.optString("highway", "unknown");
-                int velocidad =tags.optInt("maxspeed", 40);
+                int velocidad =tags.optInt("maxspeed", obtenerVelocidadPorDefecto(tipo));
                 Calle calle =new Calle(obj.getLong("id"), nombre, oneway,velocidad,tipo);
 
 
@@ -190,5 +186,18 @@ public class LectorJson {
         List<Vertice> listaVertices = new ArrayList<>(vertices.values());
         listaVertices.sort((v1,v2)-> Integer.compare(v1.getIndice(), v2.getIndice()));
         return new DatosMapa(listaVertices,listaAristas);
+    }
+    
+    private int obtenerVelocidadPorDefecto(String tipo){
+        int vel;
+        switch (tipo) {
+            case "primary": vel = 60; break;
+            case "secondary":vel = 40; break;
+            case "tertiary": vel = 40; break;
+            case "living_street": vel = 20;break;
+            case "residential": vel = 40; break;             
+            default: vel = 30;break;
+        }
+        return vel;
     }
 }

@@ -7,31 +7,33 @@ public class Vehiculo implements Comparable<Vehiculo> {
     private long IDVertice;
     private int verticeIndiceOrigen;
     private double ETA;
+    private boolean disponible; //Disponibilidad
 
     public Vehiculo(int ID, int posOrigen){
         this.ID = setID();
         this.verticeIndiceOrigen = posOrigen;
         this.ETA = 0.0;
+        this.disponible = true;
     }
     public void setActualEta(double ETA){
         this.ETA = ETA;
     }
+
     @Override
-    public int compareTo(Vehiculo otro){
-        return Double.compare(this.ETA, otro.ETA);
-    }
-    public String getID() {
-        return ID;
-    }
-    public long getIDvertice(){
-        return IDVertice;
-    }
-    public int getVerticeIndiceOrigen() {
-        return verticeIndiceOrigen;
-    }
-    public double getETA() {
-        return ETA;
-    }
+    public int compareTo(Vehiculo otro){return Double.compare(this.ETA, otro.ETA);}
+
+    public String getID() {return this.ID;}
+    
+    public long getIDvertice(){return this.IDVertice;}
+    
+    public int getVerticeIndiceOrigen() {return this.verticeIndiceOrigen;}
+    
+    public double getETA() {return this.ETA;}
+    
+    public boolean getDisponible(){return this.disponible;}
+    
+    public void setDisponible(boolean disponible) {this.disponible = disponible;}
+    
     private String setID(){
         StringBuilder pat; Random ran; int numran; char letter;
         pat = new StringBuilder();

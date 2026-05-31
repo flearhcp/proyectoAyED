@@ -12,7 +12,7 @@ public class Arista {
         this.origen = origen;
         this.destino = destino;
         this.calle = calle;
-        this.peso = 1;
+        this.peso = calle.getVelocidadMaxima() / 3.6;
      /*    this.distancia = distancia;
         this.tiempo = tiempo; */
     }

@@ -17,12 +17,12 @@ public class TestGUI extends Application {
         LectorJson lector = new LectorJson(ruta);
         DatosMapa datos = lector.generarDatosMapa();
         GrafoMapa grafo = new GrafoMapa(datos.getCantidadVertices(), datos);
-        
+        grafo.cargarGrafo();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/GUI/ventana.fxml"));
         Parent root = loader.load(); 
         
         ControladorGUI controlador = loader.getController();
-        controlador.setGrafo(grafo);
+        controlador.setGrafoyDatos(grafo,datos);
         
         primaryStage.setTitle("Sistema de despacho ETA - Salta MacroCentro");
         primaryStage.setScene(new Scene(root));

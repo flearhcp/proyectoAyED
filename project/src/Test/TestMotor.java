@@ -30,7 +30,8 @@ public class TestMotor {
 
             // Despachar el viaje al vehículo más cercano (menor ETA)
             System.out.println("Iniciando despacho de viaje...");
-            Vehiculo asignado = motor.despacharViaje(pasajero, flota);
+            ResultadoDespacho resultado = motor.despacharViaje(pasajero, flota);
+            Vehiculo asignado = resultado.getVehiculoAsignado();
 
             if (asignado != null) {
                 System.out.println("Despacho exitoso.");

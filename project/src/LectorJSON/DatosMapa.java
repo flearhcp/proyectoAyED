@@ -23,21 +23,49 @@ public class DatosMapa {
     public List<Arista> getAristas () {
         return this.aristas;
     }
-
+    public Vertice getVerticePorIndice(int i){ return this.vertices.get(i);}
+    
     public double getMaxLat() {
-        return vertices.get(getCantidadVertices() - 1).getLatitud();
+        double max;
+        max = -999999;
+        for (Vertice vertice : vertices) {
+            if( vertice.getLatitud() > max){
+                max = vertice.getLatitud();
+            }
+        }
+        return max;
     }
 
     public double getMinLat() {
-        return vertices.get(0).getLatitud();
+        double min;
+        min = 999999;
+        for (Vertice vertice : vertices) {
+            if(vertice.getLatitud() < min){
+                min = vertice.getLatitud();
+            }
+        }
+        return min;
     }
 
     public double getMinLon() {
-        return vertices.get(0).getLongitud();
+        double min;
+        min = 99999;
+        for (Vertice v : vertices) {
+            if(v.getLongitud() < min){
+                min = v.getLongitud();
+            }
+        }
+        return min;
     }
 
     public double getMaxLon() {
-        return vertices.get(getCantidadVertices() - 1).getLongitud();
+        double max;
+        max = -999999;
+        for (Vertice v : vertices) {
+            if(v.getLongitud() > max)
+                max = v.getLongitud();
+        }
+        return max;
     }
 
 }
