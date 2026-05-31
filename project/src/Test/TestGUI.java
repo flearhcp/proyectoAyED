@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 public class TestGUI extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
-        String ruta = "D:/AYED_2026/practico_Final/export.json";
+        String ruta = "D:/AYED_2026/practico_Final/project/src/recursos/5Cuadras.json";
         LectorJson lector = new LectorJson(ruta);
         DatosMapa datos = lector.generarDatosMapa();
         GrafoMapa grafo = new GrafoMapa(datos.getCantidadVertices(), datos);

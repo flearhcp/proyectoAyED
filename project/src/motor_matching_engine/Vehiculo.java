@@ -34,6 +34,8 @@ public class Vehiculo implements Comparable<Vehiculo> {
     
     public void setDisponible(boolean disponible) {this.disponible = disponible;}
     
+    public void setVerticeIndiceOrigen(int posOrigen) {this.verticeIndiceOrigen = posOrigen;}
+
     private String setID(){
         StringBuilder pat; Random ran; int numran; char letter;
         pat = new StringBuilder();

@@ -1,7 +1,7 @@
 package LectorJSON;
 
 import org.json.JSONArray;
-import org.json.JSONException;
+//import org.json.JSONException;
 import org.json.JSONObject;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -19,8 +19,8 @@ public class LectorJson {
 
     public DatosMapa generarDatosMapa() throws Exception {
         //Actualizaciones: Con esta actualizacion los nodos se cargan sin que se repita las calles.
-
-        JSONArray elementsOriginales = json.getJSONArray("elements");
+        JSONArray elements = json.getJSONArray("elements");
+        /*JSONArray elementsOriginales = json.getJSONArray("elements");
         Map<Long, JSONObject> coordenadasNodos = new HashMap<>();
         List<JSONObject> listaWays = new ArrayList<>();
         Map<Long,Coordenada> coordenadasNodos1 = new HashMap<>();
@@ -93,19 +93,32 @@ public class LectorJson {
                 e.printStackTrace();
             }
         });
-
+            */
         // CONTAR APARICIONES DE NODOS
         Map<Long, Integer> apariciones = new HashMap<>();
+        Map<Long,Coordenada> coordenadasNodos1 = new HashMap<>();
 
         for (int i = 0; i < elements.length(); i++) {
             JSONObject obj = elements.getJSONObject(i);
 
-            if (obj.getString("type").equals("way")) {
+            if (obj.getString("type").equals("node")) {
+                long nodeId = obj.getLong("id");
+                double lat = obj.getDouble("lat");
+                double lon = obj.getDouble("lon");
+                coordenadasNodos1.put(nodeId, new Coordenada(lat, lon));
+            } else if (obj.getString("type").equals("way")) {
                 JSONArray nodes = obj.getJSONArray("nodes");
+                JSONArray geometry = obj.optJSONArray("geometry");
 
                 for (int j = 0; j < nodes.length(); j++) {
                     long nodeId = nodes.getLong(j);
                     apariciones.put(nodeId, apariciones.getOrDefault(nodeId, 0) + 1);
+                    
+                    // Guardamos la coordenada leyendo el arreglo "geometry"
+                    if (geometry != null && !geometry.isNull(j)) {
+                        JSONObject geo = geometry.getJSONObject(j);
+                        coordenadasNodos1.put(nodeId, new Coordenada(geo.getDouble("lat"), geo.getDouble("lon")));
+                    }
                 }
             }
         }
@@ -130,8 +143,12 @@ public class LectorJson {
 
                         if (!vertices.containsKey(nodeId)) {
                             Coordenada coord = coordenadasNodos1.getOrDefault(nodeId,Coordenada.INVALIDA);
-                            Vertice vertice = new Vertice(contadorVertices++, nodeId, coord);
-                            vertices.put(nodeId,vertice);
+                            
+                            // Solo agregamos el vértice si la coordenada es válida (evita comprimir el mapa)
+                            if (coord.esValida()) {
+                                Vertice vertice = new Vertice(contadorVertices++, nodeId, coord);
+                                vertices.put(nodeId,vertice);
+                            }
                         }
                     }
                 }

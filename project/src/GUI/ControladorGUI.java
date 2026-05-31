@@ -1,5 +1,7 @@
 package GUI;
 
+//Importamos todas las librerias de JavaFX
+
 import javafx.fxml.Initializable;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
@@ -11,11 +13,15 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
+import javafx.scene.image.Image;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+
+//Otras librerias
+
 import java.net.URL;
 import java.util.ResourceBundle;
 import Grafos.GrafoMapa;
-// Estas importaciones se basan en suposiciones sobre la estructura de tu proyecto.
-// Puede que necesites ajustarlas según los nombres y paquetes reales de tus clases.
 import LectorJSON.*;
 import contenedores.*;
 import motor_matching_engine.*;
@@ -24,6 +30,7 @@ public class ControladorGUI implements Initializable{
     @FXML private Canvas canvasMapa;
     @FXML private ListView<String> listaVehiculos;
     @FXML private ListView<String> listaDespacho;
+    private Image imagenFondo;
     private GrafoMapa grafo;
     private MotorDespacho motor;
     private DatosMapa datos;
@@ -37,12 +44,14 @@ public class ControladorGUI implements Initializable{
 
     @Override
     public void initialize(URL location, ResourceBundle resource){
-        // Limpia el lienzo. El grafo se dibujará una vez que se establezca a través de setGrafo().
         GraphicsContext gc = canvasMapa.getGraphicsContext2D();
         gc.setFill(Color.web("#1e1e1e"));
         gc.fillRect(0, 0, canvasMapa.getWidth(), canvasMapa.getHeight());
-
-        // Inicializamos el Tooltip para mostrar información al pasar el ratón
+        try {
+            imagenFondo = new Image("/recursos/5Cuadras.jpg");
+        } catch (Exception e) {
+            System.err.println("No se pudo encontrar el fondo");
+        }
         tooltipMapa = new Tooltip();
         canvasMapa.setOnMouseMoved(this::handleMouseMoved);
         canvasMapa.setOnMouseExited(e -> tooltipMapa.hide());
@@ -141,20 +150,8 @@ public class ControladorGUI implements Initializable{
             int posVehiculo = asignado.getVerticeIndiceOrigen(); 
             this.caminoResaltado = grafo.caminoDijkstra(posVehiculo, this.pasajeroActual.getVerticeIDOrigen());
             
-            // Temporizador para liberar el vehículo tras 5 segundos (simular fin del viaje)
             Usuario pasajeroAsignado = this.pasajeroActual; // Capturamos la referencia del pasajero
-            PauseTransition pause = new PauseTransition(Duration.seconds(5));
-            pause.setOnFinished(event -> {
-                asignado.setDisponible(true);
-                // Solo limpiamos la pantalla si el usuario no solicitó un viaje nuevo en el interín
-                if (this.pasajeroActual == pasajeroAsignado) {
-                    this.caminoResaltado = null;
-                    this.pasajeroActual = null;
-                }
-                mostrarVehiculosDisponibles();
-                dibujarGrafo();
-            });
-            pause.play();
+            iniciarAnimacionViaje(asignado, pasajeroAsignado, this.caminoResaltado);
         } else {
             listaDespacho.getItems().add("No hay vehículos disponibles en este momento.");
             this.pasajeroActual = null; // Anulamos el pasajero si ningún coche le fue asignado
@@ -163,6 +160,57 @@ public class ControladorGUI implements Initializable{
         mostrarVehiculosDisponibles(); // Actualizamos la lista con los nuevos estados
         dibujarGrafo(); // Redibujamos el Canvas para que se grafique la ruta
     }
+
+    private void iniciarAnimacionViaje(Vehiculo vehiculo, Usuario pasajero, ListaDoubleLinkedL rutaHaciaPasajero) {
+        // 1. Animamos el vehículo hacia el pasajero
+        Timeline animacionHaciaPasajero = crearTimelineViaje(vehiculo, rutaHaciaPasajero, () -> {
+            
+            // Cuando el vehículo llega al pasajero, calculamos la ruta hacia el destino
+            ListaDoubleLinkedL rutaAlDestino = grafo.caminoDijkstra(pasajero.getVerticeIDOrigen(), pasajero.getVerticeIDDestino());
+            
+            // Si el usuario no hizo clic en "Nueva Solicitud" mientras tanto, actualizamos la línea roja
+            if (this.pasajeroActual == pasajero) {
+                this.caminoResaltado = rutaAlDestino;
+            }
+            
+            // 2. Animamos el vehículo hacia el destino final
+            Timeline animacionAlDestino = crearTimelineViaje(vehiculo, rutaAlDestino, () -> {
+                vehiculo.setDisponible(true); // El viaje terminó, liberamos el vehículo
+                if (this.pasajeroActual == pasajero) {
+                    this.caminoResaltado = null;
+                    this.pasajeroActual = null;
+                }
+                mostrarVehiculosDisponibles();
+                dibujarGrafo();
+            });
+            animacionAlDestino.play();
+        });
+        animacionHaciaPasajero.play();
+    }
+
+    private Timeline crearTimelineViaje(Vehiculo vehiculo, ListaDoubleLinkedL ruta, Runnable alTerminar) {
+        Timeline timeline = new Timeline();
+        double velocidadMS = 150.0; // Milisegundos por vértice (ajústalo para cambiar la velocidad)
+        
+        for (int i = 0; i < ruta.tamanio(); i++) {
+            final int index = i;
+            KeyFrame frame = new KeyFrame(Duration.millis(velocidadMS * (i + 1)), e -> {
+                int idNodo = (int) ruta.devolver(index);
+                vehiculo.setVerticeIndiceOrigen(idNodo); // Movemos el vehículo a la nueva posición
+                dibujarGrafo(); // Redibujamos el mapa para aplicar el movimiento
+            });
+            timeline.getKeyFrames().add(frame);
+        }
+        
+        // Evento especial que se dispara al finalizar el recorrido de toda la ruta
+        KeyFrame fin = new KeyFrame(Duration.millis(velocidadMS * ruta.tamanio() + 10), e -> {
+            if (alTerminar != null) alTerminar.run();
+        });
+        timeline.getKeyFrames().add(fin);
+        
+        return timeline;
+    }
+
     @FXML
     private void handleLimpiarSeleccion(){
         listaDespacho.getItems().clear();
@@ -212,7 +260,12 @@ public class ControladorGUI implements Initializable{
         if (!actualizarEscalasYOffsets()) {
             return;
         }
-
+        if(imagenFondo != null){
+            double anchoGrafoPixeles,altoGrafoPixeles;
+            anchoGrafoPixeles = (this.datos.getMaxLon() - this.mapMinLon) * mapFactorLon * mapScale;
+            altoGrafoPixeles = (mapMaxLat - this.datos.getMinLat()) * mapScale;
+            gc.drawImage(imagenFondo, mapOffsetX, mapOffsetY,anchoGrafoPixeles,altoGrafoPixeles);
+        }
         dibujarAristas(gc);
         dibujarNodos(gc);
         dibujarCaminoResaltado(gc);
@@ -246,7 +299,7 @@ public class ControladorGUI implements Initializable{
 
         this.mapOffsetX = padding + (usableW - (diffLonAjustada * this.mapScale)) / 2.0;
         this.mapOffsetY = padding + (usableH - (diffLat * this.mapScale)) / 2.0;
-
+        System.out.println("MaxLat: "+ this.mapMaxLat + " MaxLon: "+ maxLon + "\nMinLat: "+minLat+" MinLon: "+this.mapMinLon);
         return true;
     }
 
